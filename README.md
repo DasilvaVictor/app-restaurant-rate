@@ -66,6 +66,11 @@ app/src/main/java/com/chiris/app/restaurant_rate/
 │   │   ├── detail/               # Detalle + reseñas
 │   │   ├── create/               # Crear restaurante
 │   │   └── edit/                 # Editar restaurante
+│   ├── usuario/                  # Gestión de usuarios (solo ADMIN)
+│   │   ├── list/                 # Listado + eliminar
+│   │   ├── create/               # Crear usuario
+│   │   ├── edit/                 # Editar usuario
+│   │   └── component/            # RolSelector (ADMIN/USER)
 │   └── theme/                    # Colores, tipografía y tema Material 3
 └── utils/
     └── Constants.kt              # BASE_URL y paths de la API
@@ -80,6 +85,7 @@ app/src/main/java/com/chiris/app/restaurant_rate/
 - **Detalle del restaurante** con dirección, teléfono y listado de reseñas.
 - **Restaurantes**: crear, editar (PATCH parcial) y eliminar.
 - **Reseñas**: crear, editar y eliminar las propias (el backend valida la autoría; la app usa el `userId` del JWT para mostrar las acciones solo al autor).
+- **Usuarios (solo ADMIN)**: listar, crear, editar (PATCH parcial) y eliminar usuarios, con asignación de rol `ADMIN`/`USER`. Accesible desde el icono 👥 de la barra superior. Si el usuario autenticado no es administrador, el backend responde `403` y la app muestra un mensaje de "sin permisos".
 
 ## API backend
 
@@ -96,6 +102,22 @@ Todos los endpoints se sirven bajo la `BASE_URL` configurada en `utils/Constants
 | `POST` | `/api/v1/resenas` | Crea una reseña |
 | `PATCH` | `/api/v1/resenas/{id}` | Edita una reseña propia |
 | `DELETE` | `/api/v1/resenas/{id}` | Elimina una reseña propia |
+| `GET` | `/api/v1/usuarios` | Lista usuarios · **solo ADMIN** |
+| `GET` | `/api/v1/usuarios/{id}` | Detalle de un usuario · **solo ADMIN** |
+| `POST` | `/api/v1/usuarios` | Crea un usuario · **solo ADMIN** |
+| `PATCH` | `/api/v1/usuarios/{id}` | Actualiza parcialmente un usuario · **solo ADMIN** |
+| `DELETE` | `/api/v1/usuarios/{id}` | Elimina un usuario · **solo ADMIN** |
+
+> El campo `password` es de solo escritura: se envía al crear/editar pero nunca se devuelve en las respuestas. En el PATCH parcial, la contraseña solo se actualiza si se envía un valor no vacío.
+
+## Roles y permisos
+
+La API define dos roles (`ADMIN` y `USER`):
+
+- Cualquier usuario autenticado puede consultar restaurantes y gestionar sus propias reseñas.
+- La **gestión de usuarios** (`/api/v1/usuarios`) está restringida a **ADMIN** en el backend (`SecurityConfig`).
+
+> **Importante:** el JWT emitido por el backend contiene únicamente los claims `userId` y `sub` (email), **no incluye el rol**. Por eso la app no puede saber de antemano si el usuario es administrador: la pantalla de usuarios intenta cargar la lista y, si recibe un `403 Forbidden`, muestra el mensaje de "sin permisos" y oculta las acciones de gestión.
 
 ## Autenticación
 
@@ -154,3 +176,6 @@ El grafo de navegación (`ui/navigation/AppNavigation.kt`) define las siguientes
 | `create_restaurant` | Crear restaurante |
 | `detail/{id}` | Detalle de restaurante y reseñas |
 | `edit_restaurant/{id}` | Editar restaurante |
+| `usuarios` | Listado de usuarios (solo ADMIN) |
+| `create_usuario` | Crear usuario |
+| `edit_usuario/{id}` | Editar usuario |

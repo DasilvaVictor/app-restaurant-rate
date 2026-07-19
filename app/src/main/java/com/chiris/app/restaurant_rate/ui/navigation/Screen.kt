@@ -12,4 +12,12 @@ sealed class Screen(val route: String) {
     object EditRestaurant : Screen("edit_restaurant/{id}") {
         fun createRoute(id: Long) = "edit_restaurant/$id"
     }
+
+    // Gestión de usuarios (solo ADMIN en el backend).
+    object Usuarios : Screen("usuarios")
+    object CreateUsuario : Screen("create_usuario")
+
+    object EditUsuario : Screen("edit_usuario/{id}") {
+        fun createRoute(id: Long) = "edit_usuario/$id"
+    }
 }

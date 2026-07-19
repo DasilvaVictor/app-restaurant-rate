@@ -10,6 +10,9 @@ import com.chiris.app.restaurant_rate.ui.restaurant.create.CreateRestaurantScree
 import com.chiris.app.restaurant_rate.ui.restaurant.detail.DetailScreen
 import com.chiris.app.restaurant_rate.ui.restaurant.edit.EditRestaurantScreen
 import com.chiris.app.restaurant_rate.ui.restaurant.list.MainScreen
+import com.chiris.app.restaurant_rate.ui.usuario.create.CreateUsuarioScreen
+import com.chiris.app.restaurant_rate.ui.usuario.edit.EditUsuarioScreen
+import com.chiris.app.restaurant_rate.ui.usuario.list.UsuarioListScreen
 
 @Composable
 fun AppNavigation() {
@@ -54,6 +57,19 @@ fun AppNavigation() {
         composable(Screen.EditRestaurant.route) { backStackEntry ->
             val id = backStackEntry.arguments?.getString("id")?.toLongOrNull() ?: 0L
             EditRestaurantScreen(id = id, navController = navController)
+        }
+
+        composable(Screen.Usuarios.route) {
+            UsuarioListScreen(navController = navController)
+        }
+
+        composable(Screen.CreateUsuario.route) {
+            CreateUsuarioScreen(navController = navController)
+        }
+
+        composable(Screen.EditUsuario.route) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("id")?.toLongOrNull() ?: 0L
+            EditUsuarioScreen(id = id, navController = navController)
         }
     }
 }

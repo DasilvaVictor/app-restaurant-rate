@@ -28,6 +28,7 @@ import com.chiris.app.restaurant_rate.ui.restaurant.list.componet.RestaurantList
 import com.chiris.app.restaurant_rate.ui.restaurant.list.componet.SearchBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
@@ -91,6 +92,14 @@ fun MainScreen(
                     )
                 },
                 actions = {
+                    // Acceso a la gestión de usuarios (el backend restringe a ADMIN;
+                    // un usuario normal verá el mensaje de "sin permisos" al entrar).
+                    IconButton(onClick = { navController.navigate(Screen.Usuarios.route) }) {
+                        Icon(
+                            imageVector = Icons.Default.Group,
+                            contentDescription = "Gestionar usuarios"
+                        )
+                    }
                     // Botón de filtro/ordenar
                     IconButton(
                         onClick = { showFilterBottomSheet = true },
