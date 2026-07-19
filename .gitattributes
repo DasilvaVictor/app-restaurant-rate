@@ -1,0 +1,19 @@
+# Normaliza los finales de línea: en el repo siempre LF, en el working copy
+# cada quien usa lo suyo. Evita los avisos "LF will be replaced by CRLF".
+* text=auto eol=lf
+
+# Scripts que deben conservar sus finales de línea nativos
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+gradlew text eol=lf
+
+# Archivos binarios: nunca aplicar normalización de texto
+*.png    binary
+*.webp   binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.ico    binary
+*.jar    binary
+*.keystore binary
+*.jks    binary
