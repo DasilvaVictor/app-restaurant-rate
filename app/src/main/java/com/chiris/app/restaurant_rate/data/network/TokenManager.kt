@@ -16,6 +16,10 @@ object TokenManager {
     val currentUserEmail: String?
         get() = decodeClaim("sub")
 
+    fun clear() {
+        token = null
+    }
+
     private fun decodeClaim(claim: String): String? {
         val jwt = token ?: return null
         return try {

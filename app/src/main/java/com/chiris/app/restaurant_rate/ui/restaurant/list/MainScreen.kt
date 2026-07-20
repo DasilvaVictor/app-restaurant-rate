@@ -21,12 +21,16 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.chiris.app.restaurant_rate.data.model.RestaurantList
+import com.chiris.app.restaurant_rate.data.api.AuthApi
+import com.chiris.app.restaurant_rate.data.network.ApiClient
+import com.chiris.app.restaurant_rate.data.network.TokenManager
 import com.chiris.app.restaurant_rate.ui.navigation.Screen
 import com.chiris.app.restaurant_rate.ui.restaurant.list.common.ScreenTitle
 import com.chiris.app.restaurant_rate.ui.restaurant.list.componet.AddRestaurantFab
 import com.chiris.app.restaurant_rate.ui.restaurant.list.componet.RestaurantListado
 import com.chiris.app.restaurant_rate.ui.restaurant.list.componet.SearchBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material3.AlertDialog
@@ -42,6 +46,8 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import com.chiris.app.restaurant_rate.ui.restaurant.list.common.RestaurantFiltersBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,6 +62,8 @@ fun MainScreen(
     val snackbarMessage by viewModel.snackbarMessage.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
     var restaurantToDelete by remember { mutableStateOf<RestaurantList?>(null) }
+    var showLogoutDialog by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     HandleRefresh(navController, viewModel)
 
@@ -112,6 +120,13 @@ fun MainScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Sort,
                             contentDescription = "Ordenar restaurantes"
+                        )
+                    }
+                    // Cerrar sesión
+                    IconButton(onClick = { showLogoutDialog = true }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Logout,
+                            contentDescription = "Cerrar sesión"
                         )
                     }
                 },
@@ -193,6 +208,41 @@ fun MainScreen(
                         showDeleteDialog = false
                         restaurantToDelete = null
                     }) {
+                        Text("Cancelar")
+                    }
+                }
+            )
+        }
+        if (showLogoutDialog) {
+            AlertDialog(
+                onDismissRequest = { showLogoutDialog = false },
+                title = { Text("Cerrar sesión") },
+                text = { Text("¿Estás seguro de que quieres cerrar sesión?") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            showLogoutDialog = false
+                            coroutineScope.launch {
+                                try {
+                                    ApiClient.retrofit.create(AuthApi::class.java).logout()
+                                } catch (e: Exception) {
+                                    // Si falla la llamada (sin red, etc.) igual cerramos sesión localmente.
+                                }
+                                TokenManager.clear()
+                                navController.navigate(Screen.Login.route) {
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error
+                        )
+                    ) {
+                        Text("Cerrar sesión")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showLogoutDialog = false }) {
                         Text("Cancelar")
                     }
                 }
